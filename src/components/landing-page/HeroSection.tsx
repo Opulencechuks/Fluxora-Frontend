@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import "../../design-tokens.css";
 
 interface HeroSectionProps {
   theme?: "light" | "dark";
@@ -90,7 +91,7 @@ export default function HeroSection({ theme = "light" }: HeroSectionProps) {
             {/* Primary CTA Flow */}
             <div className="flex flex-wrap items-center gap-5 mt-4">
               <button
-                className="group relative flex cursor-pointer items-center gap-3 overflow-hidden rounded-2xl bg-cyan-500 px-8 py-4 text-lg font-bold text-white shadow-[0_10px_30px_-10px_rgba(6,182,212,0.5)] transition-all duration-300 hover:scale-[1.02] hover:bg-cyan-400 active:scale-95"
+                className="ui-primary-cta group relative overflow-hidden rounded-2xl px-8 py-4 text-lg font-bold shadow-[0_10px_30px_-10px_rgba(6,182,212,0.5)] transition-all duration-300 hover:scale-[1.02] active:scale-95"
                 onClick={() => window.location.href = "/connect-wallet"}
               >
                 <span className="relative z-10 flex items-center gap-2">

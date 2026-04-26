@@ -8,6 +8,7 @@ import ConnectWalletModal from '../components/ConnectWalletModal';
 import ToastNotification, {
   type ToastVariant,
 } from "../components/ToastNotification";
+import "../design-tokens.css";
 
 const ONBOARDING_KEY = 'fluxora_onboarding_dismissed';
 
@@ -109,6 +110,8 @@ export default function Dashboard() {
   if (loading) return <TreasuryOverviewLoading />;
 
   const hasStreams = streams.length > 0;
+  const primaryCtaClassName = "ui-primary-cta";
+  const compactPrimaryCtaClassName = "ui-primary-cta ui-primary-cta--compact";
 
   return (
     <div>

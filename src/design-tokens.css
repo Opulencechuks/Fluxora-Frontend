@@ -74,6 +74,16 @@
   --color-accent-secondary: #00d4aa;
   --color-accent-primary-dark: #0097a7;
   --color-accent-secondary-dark: #00a884;
+  --color-accent-primary-darkest: #006f7a;
+
+  /* ─── Semantic CTA Tokens ─── */
+  --color-cta-primary-bg: var(--color-accent-primary);
+  --color-cta-primary-bg-hover: var(--color-accent-primary-dark);
+  --color-cta-primary-bg-active: var(--color-accent-primary-darkest);
+  --color-cta-primary-text: #04131a;
+  --color-cta-secondary-bg: var(--color-surface-default);
+  --color-cta-secondary-border: var(--color-border-default);
+  --color-cta-secondary-text: var(--color-text-secondary);
 
   /* ─── Backgrounds for Status Colors ─── */
   --color-success-bg: rgba(30, 201, 142, 0.1);
@@ -251,6 +261,8 @@
   /* ─── Accent-specific shadows ─── */
   --shadow-accent-primary: 0 4px 12px rgba(0, 184, 212, 0.2);
   --shadow-accent-secondary: 0 4px 12px rgba(0, 212, 170, 0.2);
+  --shadow-cta-primary: var(--shadow-accent-primary);
+  --shadow-cta-primary-hover: 0 8px 16px rgba(0, 184, 212, 0.3);
 }
 
 /* Dark theme shadow adjustments */
@@ -262,6 +274,8 @@
 
   --shadow-accent-primary: 0 4px 12px rgba(0, 184, 212, 0.25);
   --shadow-accent-secondary: 0 4px 12px rgba(0, 212, 170, 0.25);
+  --shadow-cta-primary: var(--shadow-accent-primary);
+  --shadow-cta-primary-hover: 0 8px 16px rgba(0, 184, 212, 0.35);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -320,6 +334,91 @@
     opacity: 0;
     transform: scale(0.95);
   }
+}
+
+.ui-primary-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  min-height: 44px;
+  padding: var(--space-md) var(--space-lg);
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--color-cta-primary-bg);
+  color: var(--color-cta-primary-text);
+  font: var(--font-label-lg);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: var(--shadow-cta-primary);
+  transition:
+    background-color var(--transition-base),
+    box-shadow var(--transition-base),
+    transform var(--transition-fast);
+}
+
+.ui-primary-cta:hover {
+  background: var(--color-cta-primary-bg-hover);
+  box-shadow: var(--shadow-cta-primary-hover);
+}
+
+.ui-primary-cta:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring), var(--shadow-cta-primary-hover);
+}
+
+.ui-primary-cta:active {
+  background: var(--color-cta-primary-bg-active);
+}
+
+.ui-primary-cta:disabled {
+  background: color-mix(
+    in srgb,
+    var(--color-text-tertiary) 40%,
+    transparent
+  );
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.ui-primary-cta--compact {
+  min-height: 36px;
+  padding: var(--space-sm) var(--space-lg);
+  font: var(--font-label-md);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ui-secondary-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: var(--space-sm) var(--space-lg);
+  border: 1px solid var(--color-cta-secondary-border);
+  border-radius: var(--radius-md);
+  background: var(--color-cta-secondary-bg);
+  color: var(--color-cta-secondary-text);
+  font: var(--font-label-lg);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-base),
+    background-color var(--transition-base),
+    color var(--transition-base),
+    box-shadow var(--transition-base);
+}
+
+.ui-secondary-control:hover {
+  border-color: var(--color-accent-primary);
+  color: var(--color-text-primary);
+}
+
+.ui-secondary-control:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 /* ═══════════════════════════════════════════════════════════

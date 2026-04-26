@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ValuePropositionSection from "@/components/ValuePropositionSection";
+import "../design-tokens.css";
 
 function LandingPage() {
 	const [isDark, setIsDark] = useState(true);
@@ -15,7 +16,7 @@ function LandingPage() {
 					<button
 						type='button'
 						onClick={() => setIsDark((prev) => !prev)}
-						className='rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-cyan-500/40 dark:bg-cyan-500/10 dark:text-cyan-200 dark:hover:bg-cyan-500/20'>
+						className='ui-secondary-control'>
 						Switch to {isDark ? "Light" : "Dark"} Mode
 					</button>
 				</div>
