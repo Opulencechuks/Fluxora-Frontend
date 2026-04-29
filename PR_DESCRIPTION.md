@@ -1,124 +1,161 @@
-# Unify Design Tokens Across Marketing and Authenticated App Surfaces
+# Wallet Disconnect, Stale Session, and Reconnect Flows - Design Specification
 
 ## Summary
 
-This PR fixes a critical bug where the light theme was completely broken and establishes a unified, token-based design system across all surfaces of the Fluxora frontend.
+This PR delivers comprehensive design specifications for wallet disconnect, stale session, and reconnect flows in Fluxora-Frontend. These flows are critical for maintaining user trust and ensuring smooth interaction with Stellar wallet infrastructure.
 
 ## Problem
 
-**Critical Bug**: The app always rendered in dark mode regardless of the `data-theme` attribute because `src/index.css` contained a `:root` block with hardcoded dark-theme values that overrode the light-theme defaults from `design-tokens.css`.
-
-**Inconsistencies**: Components used a mix of hardcoded hex colors, Tailwind classes, and inline styles instead of design tokens, making theme switching impossible and creating visual inconsistencies between the marketing site and authenticated app.
+Fluxora lacked clear user-facing flows for wallet state management:
+- No intentional disconnect confirmation flow
+- Limited stale session detection and handling  
+- Missing reconnect persistence for user context
+- Inconsistent error messaging across wallet states
+- No accessibility specifications for wallet flows
 
 ## Solution
 
-### 1. Fixed Light Theme Bug
-- Removed the hardcoded dark-theme `:root` block from `src/index.css`
-- Light and dark themes now switch correctly via `data-theme` attribute
+### 1. Comprehensive Design Specification
+Created `WALLET_FLOWS_DESIGN_SPEC.md` with:
+- User goals and success metrics for wallet flows
+- Detailed specifications for disconnect, stale session, and reconnect flows
+- Component state definitions and transition patterns
+- Error handling and recovery strategies
+- Performance and cross-platform requirements
 
-### 2. Established Semantic Token Layer
-Added comprehensive semantic tokens to `design-tokens.css`:
-- `--color-bg-primary/secondary/tertiary`
-- `--color-surface-default/elevated/raised/highest`
-- `--color-text-primary/secondary/tertiary/muted/inverse`
-- `--color-border-default/secondary`
-- `--color-focus` (light: `#0ea5e9`, dark: `#00d4aa`)
-- `--color-success/warning/danger/info`
-- `--skeleton-base/shine` for loading states
+### 2. Implementation-Ready Component Specs
+Delivered `WALLET_FLOWS_COMPONENT_SPECS.md` with:
+- Complete TypeScript interfaces and component templates
+- CSS module specifications using existing Fluxora design tokens
+- Integration guide for wallet context extensions
+- Testing strategies and performance considerations
+- File structure and naming conventions
 
-### 3. Tokenized Components
-- **ConnectWalletModal**: Refactored from inline styles to CSS modules using tokens
-- **TrustSection**: Replaced all hex colors with CSS variables
-- **HeroSection**: Tokenized secondary button
-- **MetricCard**: Replaced Tailwind classes with design tokens
-- **ConnectButton**: Fixed pre-existing JSX syntax error
+### 3. Accessibility Compliance Documentation
+Provided `WALLET_FLOWS_ACCESSIBILITY_GUIDE.md` featuring:
+- WCAG 2.1 AA compliance checklist
+- Screen reader support requirements (NVDA, JAWS, VoiceOver, TalkBack)
+- Keyboard navigation specifications
+- Focus management and ARIA implementation patterns
+- Testing procedures and monitoring guidelines
 
-### 4. Updated Tests
-Fixed test assertions to check inline styles instead of computed styles (jsdom doesn't resolve CSS variables).
+### 4. User Testing Protocol
+Created `WALLET_FLOWS_USER_TESTING_PROTOCOL.md` with:
+- Participant recruitment criteria for diverse user groups
+- Detailed testing scenarios covering all wallet flows
+- Data collection and analysis framework
+- Accessibility-specific testing methodology
+- Continuous testing plan and tools
+
+## Key Design Features
+
+### Disconnect Flow
+- **Confirmation Modal**: Clear explanation of consequences with cancellation option
+- **Context Preservation**: Maintain user context across disconnection cycles
+- **Success Feedback**: Toast notifications and navbar state updates
+
+### Stale Session Handling
+- **Progressive Enhancement**: Multiple recovery levels from passive to active
+- **Auto-Reconnect**: Configurable automatic reconnection with user override
+- **Clear Communication**: Non-blocking banners and modal interventions
+
+### Reconnect Flow
+- **Smart Reconnection**: Previous wallet provider detection and selection
+- **Progress Tracking**: Multi-step progress indication with status updates
+- **State Restoration**: Complete functionality recovery with context preservation
+
+### Accessibility First
+- **WCAG 2.1 AA Compliance**: Full accessibility compliance throughout
+- **Screen Reader Support**: Comprehensive ARIA implementation
+- **Keyboard Navigation**: Complete keyboard-only operation
+- **Visual Accessibility**: High contrast, text scaling, reduced motion support
 
 ## Changes
 
 | File | Type | Description |
 |------|------|-------------|
-| `src/design-tokens.css` | Rewrite | Complete semantic token system |
-| `src/index.css` | Bug fix | Remove dark override, use tokens |
-| `src/components/ConnectWalletModal.tsx` | Refactor | CSS modules + tokens |
-| `src/components/ConnectWalletModal.module.css` | New | Token-based styles |
-| `src/components/landing-page/TrustSection.tsx` | Refactor | Tokenize colors |
-| `src/components/landing-page/HeroSection.tsx` | Refactor | Tokenize button |
-| `src/components/treasuryOverviewPage/MetricCard.tsx` | Refactor | Tokenize styles |
-| `src/components/ConnectButton.tsx` | Bug fix | Fix JSX syntax |
-| Test files (3) | Update | Fix assertions |
-| Documentation (3) | New | Implementation guides |
+| `WALLET_FLOWS_DESIGN_SPEC.md` | New | Main design specification |
+| `WALLET_FLOWS_COMPONENT_SPECS.md` | New | Implementation specifications |
+| `WALLET_FLOWS_ACCESSIBILITY_GUIDE.md` | New | Accessibility requirements |
+| `WALLET_FLOWS_USER_TESTING_PROTOCOL.md` | New | User testing methodology |
 
-**Total**: 16 files changed, 5,031 insertions(+), 1,030 deletions
+**Total**: 4 files changed, 3,375 insertions(+)
 
-## Verification
+## Integration Points
 
-### Manual Testing
-```js
-// Toggle theme in DevTools console
-document.documentElement.setAttribute("data-theme", "light");
-document.documentElement.setAttribute("data-theme", "dark");
-```
-✅ Both themes render correctly with proper colors and contrast
+### Existing Components
+- **WalletContext**: Extended with disconnect/reconnect methods
+- **WalletStatus**: Enhanced with stale session detection
+- **ConnectWalletModal**: Reference for modal patterns
+- **ToastNotification**: Used for success/error feedback
 
-### Automated Testing
-```bash
-node node_modules/vitest/vitest.mjs run
-```
-✅ 9/9 tests pass for changed components  
-✅ Zero new TypeScript errors introduced  
-✅ Zero new linting errors
+### Design System Integration
+- **Design Tokens**: Leverages existing color and spacing system
+- **CSS Modules**: Consistent styling approach with existing components
+- **Typography**: Uses established font scales and families
+- **Responsive Design**: Follows existing breakpoint patterns
 
-### Accessibility
-✅ No regressions  
-✅ All ARIA attributes preserved  
-✅ Focus rings work correctly in both themes  
-✅ `prefers-reduced-motion` respected
+## Success Metrics
 
-## Screenshots
+### Technical Success
+- [ ] All components render without console errors
+- [ ] State transitions work as specified  
+- [ ] Accessibility tests pass WCAG 2.1 AA
+- [ ] Performance budgets met (<100ms interaction delay)
 
-### Before (Light Theme Broken)
-- App always rendered in dark mode
-- Theme toggle had no effect
-- Hardcoded colors didn't respond to theme changes
+### User Experience Success
+- [ ] Users can disconnect intentionally with clear confirmation
+- [ ] Stale sessions are detected and communicated clearly
+- [ ] Reconnection happens seamlessly without data loss
+- [ ] Error states provide actionable guidance
 
-### After (Light Theme Fixed)
-- Light theme renders with white backgrounds and dark text
-- Dark theme renders with dark backgrounds and light text
-- All components respond to theme switching
-- Visual consistency between marketing and app surfaces
+### Business Success
+- [ ] Reduced support tickets for wallet connection issues
+- [ ] Improved user retention through better session management
+- [ ] Enhanced trust through transparent wallet state communication
+- [ ] Compliance with accessibility regulations
 
-## Breaking Changes
+## Implementation Roadmap
 
-**Light theme now works correctly.** If any code relied on the app always being dark, it will need updating.
+### Phase 1: Critical Components (Week 1-2)
+- WalletDisconnectModal implementation
+- StaleSessionBanner basic functionality
+- WalletContext extensions
+
+### Phase 2: Advanced Features (Week 3-4)  
+- ReconnectModal with progress tracking
+- Auto-reconnect functionality
+- Error handling and recovery
+
+### Phase 3: Polish & Testing (Week 5-6)
+- Accessibility compliance verification
+- User testing and feedback integration
+- Performance optimization
 
 ## Documentation
 
-- ✅ `DESIGN_SPEC.md` updated with implementation notes
-- ✅ `IMPLEMENTATION_SUMMARY.md` created with full details
-- ✅ `DESIGN_TOKENS_QUICK_REFERENCE.md` created for developers
+- ✅ Complete design specifications with implementation details
+- ✅ Component templates with TypeScript interfaces
+- ✅ Accessibility requirements and testing procedures
+- ✅ User testing protocols and success metrics
 
 ## Reviewer Checklist
 
-- [ ] Light theme renders correctly (white backgrounds, dark text)
-- [ ] Dark theme renders correctly (dark backgrounds, light text)
-- [ ] Theme toggle works without page refresh
-- [ ] ConnectWalletModal responds to theme changes
-- [ ] Landing page components respond to theme changes
-- [ ] No hardcoded hex colors in changed files
-- [ ] Tests pass for changed components
-- [ ] No accessibility regressions
-- [ ] Documentation is clear and complete
+- [ ] Design specifications are comprehensive and clear
+- [ ] Component specifications are implementation-ready
+- [ ] Accessibility requirements meet WCAG 2.1 AA standards
+- [ ] User testing protocols cover all scenarios
+- [ ] Integration points with existing codebase are identified
+- [ ] Success metrics are measurable and achievable
+- [ ] Documentation is complete and well-organized
 
 ## Related Issues
 
-Closes #[issue-number]
+Addresses wallet flow UX requirements for treasury and recipient users.
 
 ---
 
-**Type**: UI/UX Enhancement + Bug Fix  
-**Scope**: Design System, Theming  
-**Impact**: High (fixes critical light theme bug)  
-**Risk**: Low (comprehensive testing, backward compatible)
+**Type**: Design Specification  
+**Scope**: Wallet Flows, UX Design, Accessibility  
+**Impact**: High (improves user trust and wallet experience)  
+**Risk**: Low (design-only, no code changes)
