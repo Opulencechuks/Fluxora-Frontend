@@ -135,8 +135,6 @@ export default function ConnectWalletModal({
           onFocus={() => setIsCloseFocused(true)}
           onBlur={() => setIsCloseFocused(false)}
           onClick={onClose}
-          onFocus={() => setIsCloseFocused(true)}
-          onBlur={() => setIsCloseFocused(false)}
           aria-label="Close wallet connection dialog"
         >
           <svg

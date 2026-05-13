@@ -92,8 +92,6 @@ export default function AppNavbar({
   const { connected, address, network, disconnect } = useWallet();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [connecting, setConnecting] = useState(false);
-  const focusRingClassName =
-    "outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--navbar-bg)]";
 
   // Simulate a brief "connecting" state on first mount when wallet restores session
   useEffect(() => {

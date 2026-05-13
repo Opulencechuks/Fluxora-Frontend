@@ -12,7 +12,6 @@ export default function MetricCard({ icon, label, value, desc }: Metric) {
   return (
     <div
       className="flex flex-col rounded-xl p-6 h-full"
-      style={{ backgroundColor: "var(--color-surface-default)", border: "1px solid var(--color-border-default)" }}
       role="group"
       aria-label={label}
       style={{

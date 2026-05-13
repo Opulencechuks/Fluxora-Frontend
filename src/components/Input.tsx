@@ -19,7 +19,7 @@
  *   <Input label="Password" type="password" required disabled />
  */
 
-import React, { InputHTMLAttributes, ReactNode } from 'react';
+import { InputHTMLAttributes } from 'react';
 import styles from './Input.module.css';
 
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {

@@ -78,7 +78,7 @@ describe("EmptyState — loading state", () => {
 
   it("loading skeleton has accessible label", () => {
     render(<EmptyState variant="treasury" loading={true} />);
-    expect(screen.getByRole("status", { name: "Loading" })).toBeInTheDocument();
+    expect(screen.getByRole("status", { name: "Loading content" })).toBeInTheDocument();
   });
 });
 

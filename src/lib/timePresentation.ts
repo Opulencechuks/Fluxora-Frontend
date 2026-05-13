@@ -157,7 +157,7 @@ export function getCliffStatusText(cliffDate: string | undefined): string {
  * Combined time display for stream cards
  */
 export function formatStreamTimeRange(
-  startDate: string,
+  _startDate: string,
   cliffDate?: string,
   endDate?: string
 ): TimeDisplay {
@@ -193,7 +193,7 @@ export function formatDetailTime(
 
   const absolute = formatDateWithTimezone(dateString, {
     showTime: includeTimezone,
-    showTimezone,
+    showTimezone: includeTimezone,
     format: "medium",
   });
 

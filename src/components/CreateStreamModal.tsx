@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import './CreateStreamModal.css';
 import { InputField } from './InputField';
 import { useModalAccessibility } from './useModalAccessibility';

@@ -135,9 +135,8 @@ export default function Dashboard() {
   if (loading) return <TreasuryOverviewLoading />;
 
   const hasStreams = streams.length > 0;
-  const primaryCtaClassName = "ui-primary-cta";
-  const compactPrimaryCtaClassName = "ui-primary-cta ui-primary-cta--compact";
 
+  return (
     <div>
       {/* Hidden live region for screen readers */}
       <div aria-live="polite" aria-atomic="true" className="sr-only">

@@ -20,7 +20,6 @@ import {
 import {
   formatDateWithTimezone,
   getRelativeTime,
-  getCliffStatus,
   getCliffStatusText,
   formatDetailTime,
   getUrgencyLevel,
@@ -873,7 +872,11 @@ export default function Streams() {
       )}
 
       {toast && (
-        <ToastNotification message={toast.message} variant={toast.variant} />
+        <ToastNotification
+          message={toast.message}
+          variant={toast.variant}
+          onClose={() => setToast(null)}
+        />
       )}
 
       <CreateStreamModal

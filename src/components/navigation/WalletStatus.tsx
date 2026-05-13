@@ -56,10 +56,6 @@ export default function WalletStatus({
     } catch {}
   };
 
-  const explorerUrl = isTestnet
-    ? `https://stellar.expert/explorer/testnet/account/${address}`
-    : `https://stellar.expert/explorer/public/account/${address}`;
-
   return (
     <div ref={ref} className="flex items-center gap-2">
       {/* Network Badge */}
