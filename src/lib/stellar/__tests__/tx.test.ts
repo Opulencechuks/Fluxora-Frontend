@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createStream, withdraw, pauseStream, cancelStream, TransactionError } from "../tx";
 import * as freighter from "@stellar/freighter-api";
-import { rpc as SorobanRpc, Account, Keypair } from "@stellar/stellar-sdk";
+import { rpc as SorobanRpc, Account } from "@stellar/stellar-sdk";
 
 // Mock freighter api
 vi.mock("@stellar/freighter-api", () => {
