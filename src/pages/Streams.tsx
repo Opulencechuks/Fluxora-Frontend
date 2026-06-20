@@ -1,6 +1,9 @@
 import {
+  memo,
+  useCallback,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
   type CSSProperties,
@@ -81,7 +84,7 @@ function HealthPill({ health }: { health: StreamHealth }) {
   );
 }
 
-function StreamMetricCard({
+const StreamMetricCard = memo(function StreamMetricCard({
   label,
   value,
   description,
@@ -97,9 +100,9 @@ function StreamMetricCard({
       <p>{description}</p>
     </div>
   );
-}
+});
 
-function StreamDisclosure({
+const StreamDisclosure = memo(function StreamDisclosure({
   expanded,
   disclosureId,
   labelledBy,
@@ -181,9 +184,20 @@ function StreamDisclosure({
       </div>
     </div>
   );
-}
+});
 
-function StreamCard({
+type StreamCardProps = {
+  stream: StreamRecord;
+  expanded: boolean;
+  selected: boolean;
+  onToggle: (streamId: string) => void;
+  onSelect: (streamId: string) => void;
+  onOpenDetail: (streamId: string) => void;
+  onAnnounceToggle: (streamName: string, expanded: boolean) => void;
+};
+
+// Memoized so unrelated page state updates do not repaint every stream card.
+const StreamCard = memo(function StreamCard({
   stream,
   expanded,
   selected,
@@ -191,31 +205,40 @@ function StreamCard({
   onSelect,
   onOpenDetail,
   onAnnounceToggle,
-}: {
-  stream: StreamRecord;
-  expanded: boolean;
-  selected: boolean;
-  onToggle: () => void;
-  onSelect: () => void;
-  onOpenDetail: () => void;
-  onAnnounceToggle: (expanded: boolean) => void;
-}) {
+}: StreamCardProps) {
   const urgency = getUrgencyLevel(stream.cliffDate, stream.endDate);
   const cliffStatus = getCliffStatusText(stream.cliffDate);
   const endRelative = getRelativeTime(stream.endDate);
   const disclosureId = `stream-expanded-${stream.id}`;
   const toggleId = `stream-toggle-${stream.id}`;
 
-  function handleKeyDown(e: React.KeyboardEvent<HTMLElement>) {
+  const handleSelect = useCallback(() => {
+    onSelect(stream.id);
+  }, [onSelect, stream.id]);
+
+  const handleToggle = useCallback(() => {
+    onToggle(stream.id);
+    onAnnounceToggle(stream.name, !expanded);
+  }, [expanded, onAnnounceToggle, onToggle, stream.id, stream.name]);
+
+  const handleOpenDetail = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      onOpenDetail(stream.id);
+    },
+    [onOpenDetail, stream.id],
+  );
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLElement>) => {
     // Enter/Space selects the card; do not intercept if a button inside is focused
     if (
       e.target === e.currentTarget &&
       (e.key === "Enter" || e.key === " ")
     ) {
       e.preventDefault();
-      onSelect();
+      handleSelect();
     }
-  }
+  }, [handleSelect]);
 
   const classNames = [
     "stream-card",
@@ -234,7 +257,7 @@ function StreamCard({
       aria-selected={selected}
       aria-expanded={expanded}
       aria-label={`${stream.name} — ${stream.status}`}
-      onClick={onSelect}
+      onClick={handleSelect}
       onKeyDown={handleKeyDown}
     >
       <div className="stream-card__header">
@@ -256,10 +279,7 @@ function StreamCard({
             type="button"
             className="streams-secondary-button"
             id={toggleId}
-            onClick={() => {
-              onToggle();
-              onAnnounceToggle(!expanded);
-            }}
+            onClick={handleToggle}
             aria-expanded={expanded}
             aria-controls={disclosureId}
           >
@@ -268,7 +288,7 @@ function StreamCard({
           <button
             type="button"
             className="streams-ghost-button"
-            onClick={(e) => { e.stopPropagation(); onOpenDetail(); }}
+            onClick={handleOpenDetail}
           >
             Open detail
           </button>
@@ -430,7 +450,7 @@ function StreamCard({
       </StreamDisclosure>
     </article>
   );
-}
+});
 
 function StreamDetail({
   stream,
@@ -724,22 +744,39 @@ export default function Streams() {
     return () => window.clearTimeout(timer);
   }, []);
 
-  const visibleStreams = streamRecords
-    .filter((stream) => {
-      const matchesStatus =
-        statusFilter === "All" || stream.status === statusFilter;
-      const matchesSearch =
-        stream.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        stream.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        stream.recipientName.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesStatus && matchesSearch;
-    })
-    .sort((a, b) => {
-      if (sortBy === "name") return a.name.localeCompare(b.name);
-      if (sortBy === "rate") return b.monthlyRate - a.monthlyRate;
-      // Default to recent (higher ID first for demo)
-      return b.id.localeCompare(a.id);
-    });
+  const activeStreams = streamRecords.filter((stream) => stream.status === "Active");
+  const monthlyOutflow = activeStreams.reduce(
+    (total, stream) => total + stream.monthlyRate,
+    0,
+  );
+  const withdrawableNow = streamRecords.reduce(
+    (total, stream) => total + stream.withdrawableAmount,
+    0,
+  );
+  const nextUnlock = activeStreams
+    .map((stream) => stream.nextUnlockDate)
+    .filter(Boolean)
+    .sort()[0];
+  const visibleStreams = useMemo(() => {
+    const normalizedSearch = searchQuery.toLowerCase();
+
+    return streamRecords
+      .filter((stream) => {
+        const matchesStatus =
+          statusFilter === "All" || stream.status === statusFilter;
+        const matchesSearch =
+          stream.name.toLowerCase().includes(normalizedSearch) ||
+          stream.id.toLowerCase().includes(normalizedSearch) ||
+          stream.recipientName.toLowerCase().includes(normalizedSearch);
+        return matchesStatus && matchesSearch;
+      })
+      .sort((a, b) => {
+        if (sortBy === "name") return a.name.localeCompare(b.name);
+        if (sortBy === "rate") return b.monthlyRate - a.monthlyRate;
+        // Default to recent (higher ID first for demo)
+        return b.id.localeCompare(a.id);
+      });
+  }, [searchQuery, sortBy, statusFilter]);
 
   useEffect(() => {
     if (!hasMountedFilterAnnouncer.current) {
@@ -757,22 +794,6 @@ export default function Streams() {
 
     return () => window.clearTimeout(timer);
   }, [announce, searchQuery, sortBy, statusFilter, visibleStreams.length]);
-
-  if (loading) return <StreamsLoading />;
-
-  const activeStreams = streamRecords.filter((stream) => stream.status === "Active");
-  const monthlyOutflow = activeStreams.reduce(
-    (total, stream) => total + stream.monthlyRate,
-    0,
-  );
-  const withdrawableNow = streamRecords.reduce(
-    (total, stream) => total + stream.withdrawableAmount,
-    0,
-  );
-  const nextUnlock = activeStreams
-    .map((stream) => stream.nextUnlockDate)
-    .filter(Boolean)
-    .sort()[0];
   const selectedStream = streamId ? getStreamRecord(streamId) : undefined;
   const hasStreams = streamRecords.length > 0;
   const showEmptyState = !selectedStream && (!walletConnected || !hasStreams);
@@ -789,11 +810,11 @@ export default function Streams() {
     ? expandedStreamId
     : visibleStreams[0]?.id;
 
-  const handleCreateStream = () => {
+  const handleCreateStream = useCallback(() => {
     setIsCreateModalOpen(true);
-  };
+  }, []);
 
-  const handleStreamCreated = () => {
+  const handleStreamCreated = useCallback(() => {
     const generatedId = `STR-${String(streamRecords.length + 1).padStart(3, "0")}`;
     setCreatedStream({
       id: generatedId,
@@ -801,9 +822,9 @@ export default function Streams() {
     });
     setIsCreateModalOpen(false);
     setIsSuccessModalOpen(true);
-  };
+  }, []);
 
-  const handleCopyRecipient = async (stream: StreamRecord) => {
+  const handleCopyRecipient = useCallback(async (stream: StreamRecord) => {
     try {
       await navigator.clipboard.writeText(stream.recipientAddress);
       addToast(
@@ -816,7 +837,30 @@ export default function Streams() {
         "error",
       );
     }
-  };
+  }, [addToast]);
+
+  const handleToggleStreamCard = useCallback((streamId: string) => {
+    setExpandedStreamId((current) => (current === streamId ? "" : streamId));
+  }, []);
+
+  const handleSelectStreamCard = useCallback((streamId: string) => {
+    setSelectedStreamId(streamId);
+  }, []);
+
+  const handleOpenStreamDetail = useCallback((streamId: string) => {
+    navigate(`/app/streams/${streamId}`);
+  }, [navigate]);
+
+  const handleAnnounceStreamToggle = useCallback(
+    (streamName: string, nextExpanded: boolean) => {
+      announce(
+        `${streamName} deep dive ${nextExpanded ? "expanded" : "collapsed"}.`,
+      );
+    },
+    [announce],
+  );
+
+  if (loading) return <StreamsLoading />;
 
   if (streamId && !selectedStream) {
     return (
@@ -1005,21 +1049,10 @@ export default function Streams() {
                     stream={stream}
                     expanded={effectiveExpandedId === stream.id}
                     selected={selectedStreamId === stream.id}
-                    onSelect={() => setSelectedStreamId(stream.id)}
-                    onToggle={() =>
-                      setExpandedStreamId((current) =>
-                        current === stream.id ? "" : stream.id,
-                      )
-                    }
-                    onAnnounceToggle={(nextExpanded) =>
-                      announce(
-                        `${stream.name} deep dive ${
-                          nextExpanded ? "expanded" : "collapsed"
-                        }.`,
-                      )
-                    }
-                    onSelect={() => setSelectedStreamId(stream.id)}
-                    onOpenDetail={() => navigate(`/app/streams/${stream.id}`)}
+                    onToggle={handleToggleStreamCard}
+                    onSelect={handleSelectStreamCard}
+                    onAnnounceToggle={handleAnnounceStreamToggle}
+                    onOpenDetail={handleOpenStreamDetail}
                   />
                 ))
               ) : (
