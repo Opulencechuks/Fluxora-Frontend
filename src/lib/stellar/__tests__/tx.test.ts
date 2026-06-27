@@ -281,6 +281,40 @@ describe("Soroban transaction layer (tx.ts)", () => {
     );
   });
 
+  // Additional tests for each rejection keyword and a non‑matching error
+  const rejectionKeywords = [
+    "reject",
+    "decline",
+    "cancel",
+    "dismiss",
+  ];
+
+  rejectionKeywords.forEach((kw) => {
+    it(`should map Freighter signing error containing keyword '${kw}' to rejected`, async () => {
+      vi.mocked(freighter.signTransaction).mockRejectedValue(new Error(`User ${kw} the request`));
+      await expect(
+        createStream(mockAddress, mockAddress, "1000", 100, 1000)
+      ).rejects.toThrowError(
+        new TransactionError(
+          "rejected",
+          "Transaction signature request was declined by the user."
+        )
+      );
+    });
+  });
+
+  it("should treat unknown signing error as generic rejected error", async () => {
+    vi.mocked(freighter.signTransaction).mockRejectedValue(new Error("Some other error"));
+    await expect(
+      createStream(mockAddress, mockAddress, "1000", 100, 1000)
+    ).rejects.toThrowError(
+      new TransactionError(
+        "rejected",
+        expect.stringContaining("Freighter signing failed")
+      )
+    );
+  });
+
   it("should throw simulation error if transaction simulation fails", async () => {
     serverInstance.simulateTransaction.mockResolvedValue({
       error: "Simulation failed: insufficient auth",

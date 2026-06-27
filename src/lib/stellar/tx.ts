@@ -24,6 +24,31 @@ export class TransactionError extends Error {
 }
 
 /**
+ * Maps Freighter signing errors to a TransactionError of type "rejected".
+ * Checks for a structured error code (`user_rejected`) first, then falls back to
+ * case‑insensitive keyword matching (`reject`, `decline`, `cancel`, `dismiss`).
+ * This provides a robust classification without relying on localized message strings.
+ */
+function mapFreighterSigningError(err: any): TransactionError {
+  const maybeErr = err as { code?: string };
+  if (maybeErr.code && maybeErr.code === "user_rejected") {
+    return new TransactionError(
+      "rejected",
+      "Transaction signature request was declined by the user."
+    );
+  }
+  const errMsg = String(err);
+  const rejectionKeywords = ["reject", "decline", "cancel", "dismiss"];
+  if (rejectionKeywords.some((kw) => errMsg.toLowerCase().includes(kw))) {
+    return new TransactionError(
+      "rejected",
+      "Transaction signature request was declined by the user."
+    );
+  }
+  return new TransactionError("rejected", `Freighter signing failed: ${errMsg}`);
+}
+
+/**
  * Returns the appropriate network passphrase for a given network name.
  * @param networkName - The name of the network (e.g. "TESTNET", "PUBLIC").
  */
@@ -278,16 +303,7 @@ async function executeInvocation(
     });
     signedXdr = signResult.signedTxXdr;
   } catch (err: any) {
-    const errMsg = String(err);
-    if (
-      errMsg.toLowerCase().includes("reject") ||
-      errMsg.toLowerCase().includes("decline") ||
-      errMsg.toLowerCase().includes("cancel") ||
-      errMsg.toLowerCase().includes("dismiss")
-    ) {
-      throw new TransactionError("rejected", "Transaction signature request was declined by the user.");
-    }
-    throw new TransactionError("rejected", `Freighter signing failed: ${errMsg}`);
+    throw mapFreighterSigningError(err);
   }
 
   // 6. Submit transaction to RPC
