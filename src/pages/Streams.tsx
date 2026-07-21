@@ -38,7 +38,6 @@ import { formatUsdc } from "../lib/formatters";
 import { useLiveAnnouncer } from "../hooks/useLiveAnnouncer";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import { useTickingNow } from "../hooks/useTickingNow";
-import { formatUsdc } from "../lib/formatters";
 import "./Streams.css";
 import TruncatedAddress from "../components/common/TruncatedAddress";
 
