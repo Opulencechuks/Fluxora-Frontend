@@ -21,6 +21,30 @@ export default function TreasuryPage() {
   const { metrics, streams, isDemoMode, loading, error, refetch } =
     useTreasuryOverviewData();
 
+  if (loading) {
+    return (
+      <div className="p-6 flex flex-col gap-8 bg-gray-50 min-h-screen">
+        {isDemoMode && <DemoBanner />}
+        <Header />
+        <div role="status" className="text-sm text-gray-500">
+          Loading treasury overview...
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 flex flex-col gap-8 bg-gray-50 min-h-screen">
+        {isDemoMode && <DemoBanner />}
+        <Header />
+        <div role="alert" className="text-sm text-red-600">
+          {error}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 flex flex-col gap-8 bg-gray-50 min-h-screen">
       {isDemoMode && <DemoBanner />}
