@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import RecentStreams, { Stream } from "../components/RecentStreams";
 import CreateStreamModal from "../components/CreateStreamModal";
-import TreasuryOverviewLoading from "../components/TreasuryOverviewLoading";
 import TreasuryEmptyState from "../components/TreasuryEmptyState";
 import TreasuryOnboarding from "../components/TreasuryOnboarding";
 import ConnectWalletModal from "../components/ConnectWalletModal";
