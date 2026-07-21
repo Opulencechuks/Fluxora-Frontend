@@ -105,8 +105,6 @@ export default function Dashboard() {
     });
   };
 
-  if (loading) return <TreasuryOverviewLoading />;
-
   const hasStreams = streams.length > 0;
   const hasError = !!error;
 
@@ -212,17 +210,24 @@ export default function Dashboard() {
         </div>
       )}
 
-      {hasStreams ? (
+      {loading || hasError || hasStreams ? (
         <>
-          <RecentStreams streams={streams} />
-          <button
-            type="button"
-            className="button button--primary"
-            onClick={() => setIsModalOpen(true)}
-            aria-label="Create stream"
-          >
-            Create stream
-          </button>
+          <RecentStreams
+            streams={streams}
+            loading={loading}
+            error={error}
+            onRetry={refetch}
+          />
+          {!loading && !error && (
+            <button
+              type="button"
+              className="button button--primary"
+              onClick={() => setIsModalOpen(true)}
+              aria-label="Create stream"
+            >
+              Create stream
+            </button>
+          )}
         </>
       ) : showOnboarding ? (
         <TreasuryOnboarding
